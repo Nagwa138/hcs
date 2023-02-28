@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #products {
+            display: flex;
+            gap: 20px;
+            padding: 10px;
+            flex-wrap: wrap;
+        }
+
+        .product {
+            min-width: 20%;
+            min-height: 10vh;
+            background-color: aqua;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <form action="google" onsubmit="return validate(this)" >
+        <div>
+            Product name : <input type="text" > <br>
+        </div>
+        <div>
+            Product count : <input type="number" > <br>
+       
+        </div>
+       <p>
+
+       </p>
+        <button type="submit">
+            Create
+        </button>
+    </form>
+    <div id="products"></div>
+
+    <div id="demo">
+
+    </div>
+    <script>
+        // form validation
+        
+        // localStorage.setItem('products', '[]')
+
+
+        let para = document.querySelector('p')
+
+        let productsContainer = document.getElementById('products')
+
+        let products = JSON.parse(localStorage.getItem('products'))
+
+        function validate(form)
+        {
+            for(item of form)
+            {
+                if(item.type != 'submit')
+                {
+                    if(item.value.length < 1)
+                    {
+                        para.innerHTML = 'Please fill all fields!'
+                        para.style.color = 'red'
+                        return false;
+                    } else {
+                        para.innerHTML = ''
+                    }
+                }
+            }
+
+            addProduct( form[0].value ,  form[1].value );
+            
+            return false;
+        }
+
+        function addProduct(name, count)
+        {
+            products.push({
+                name : name,
+                count : count
+            })
+
+            showProducts()
+        }
+
+        function showProducts()
+        {
+
+            localStorage.setItem('products', JSON.stringify(products))
+
+            productsContainer.innerHTML = ''
+
+            products = JSON.parse(localStorage.getItem('products'))
+
+            for(item in products)
+            {   
+
+                // console.log(products[item])
+                let product = document.createElement('div')
+                product.innerHTML = 'Product name : ' + products[item].name + ' , count : ' + products[item].count 
+                product.classList.add('product')
+                let btn = document.createElement('button')
+                btn.innerHTML = 'Delete'
+                btn.onclick = function(event)
+                {
+                    products.splice(item, 1)
+
+                    localStorage.setItem('products',JSON.stringify(products))
+                    // delete from local storage
+                    event.target.parentElement.remove()
+                }
+                product.appendChild(btn)
+                productsContainer.appendChild(product)
+            }
+        }
+
+        showProducts()
+
+        // xml http request
+
+        const request = new XMLHttpRequest();
+        // connect 
+
+
+        request.open('GET', 'https://dummyjson.com/products')
+
+
+        // send
+
+        request.send()
+
+        // load response -> use
+
+        request.onload = function()
+        {
+            console.log(this.status)
+
+            let apiProducts = JSON.parse(this.response).products
+
+            for(item of apiProducts )
+            {
+                console.log(item.title)
+                addProduct(item.title, item.id)
+            }
+        }
+
+    </script>
+</body>
+</html>
